@@ -1,0 +1,80 @@
+{
+  "name": "task-manager",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/index.js",
+  "bin": {
+    "task-manager": "dist/bin/index.js"
+  },
+  "engines": {
+    "node": "8.2.1"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "scripts": {
+    "gulp": "gulp",
+    "nodemon": "nodemon",
+    "test": "jest",
+    "babel-node": "babel-node",
+    "start": "gulp server",
+    "eslint": "eslint",
+    "webpack": "webpack",
+    "build": "npm run webpack -- -p --env production && babel src --out-dir dist --source-maps inline",
+    "postinstall": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/antonshwab/project-lvl4-s113.git"
+  },
+  "author": "Anton Shvab",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/antonshwab/project-lvl4-s113/issues"
+  },
+  "homepage": "https://github.com/antonshwab/project-lvl4-s113#readme",
+  "dependencies": {
+    "babel-cli": "*",
+    "babel-core": "*",
+    "babel-loader": "*",
+    "babel-plugin-transform-runtime": "*",
+    "babel-polyfill": "*",
+    "babel-preset-env": "*",
+    "babel-preset-stage-0": "*",
+    "bootstrap": "4.0.0-alpha.6",
+    "css-loader": "*",
+    "debug": "*",
+    "dotenv": "*",
+    "gulp": "*",
+    "gulp-util": "*",
+    "jquery": "*",
+    "jquery-ujs": "*",
+    "koa": "*",
+    "koa-bodyparser": "*",
+    "koa-flash-simple": "*",
+    "koa-generic-session": "*",
+    "koa-logger": "*",
+    "koa-methodoverride": "*",
+    "koa-pug": "*",
+    "koa-router": "next",
+    "koa-static": "*",
+    "koa-webpack": "*",
+    "lodash": "*",
+    "pg": "*",
+    "sequelize": "*",
+    "sqlite3": "*",
+    "style-loader": "*",
+    "umzug": "*",
+    "webpack": "*"
+  },
+  "devDependencies": {
+    "babel-eslint": "*",
+    "eslint": "*",
+    "eslint-config-airbnb-base": "*",
+    "eslint-plugin-import": "*",
+    "jest": "^20",
+    "jest-supertest-matchers": "*",
+    "nodemon": "*",
+    "supertest": "*"
+  }
+}
