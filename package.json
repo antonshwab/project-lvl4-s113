@@ -55,7 +55,7 @@
     "koa-generic-session": "*",
     "koa-logger": "*",
     "koa-methodoverride": "*",
-    "koa-pug": "*",
+    "koa-pug": "3.0.0-2",
     "koa-router": "next",
     "koa-static": "*",
     "koa-webpack": "*",
