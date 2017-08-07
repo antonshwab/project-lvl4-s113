@@ -1,5 +1,3 @@
-// @flow
-
 import 'babel-polyfill';
 
 import path from 'path';
@@ -14,6 +12,7 @@ import session from 'koa-generic-session';
 import flash from 'koa-flash-simple';
 import _ from 'lodash';
 import methodOverride from 'koa-methodoverride';
+import rollbar from 'rollbar';
 
 import getWebpackConfig from '../webpack.config.babel';
 import addRoutes from './controllers';
@@ -65,5 +64,10 @@ export default () => {
     ],
   });
   pug.use(app);
+
+  rollbar.init('a07d766f19784046a86663c51e842310');
+  rollbar.reportMessage('Hello world!');
+  app.use(rollbar.errorHandler('a07d766f19784046a86663c51e842310'));
+
   return app;
 };
