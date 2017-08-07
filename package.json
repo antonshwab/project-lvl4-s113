@@ -78,5 +78,16 @@
     "jest-supertest-matchers": "*",
     "nodemon": "*",
     "supertest": "*"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverage": true,
+    "coverageReporters": [
+      "lcov"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/__tests__/__fixtures__/"
+    ]
   }
 }

@@ -1,8 +1,8 @@
-# nodejs-package
+# nodejs-task-manager
 
-[![Code Climate](https://codeclimate.com/github/hexlet-boilerplates/nodejs-package/badges/gpa.svg)](https://codeclimate.com/github/hexlet-boilerplates/nodejs-package)
-[![Issue Count](https://codeclimate.com/github/hexlet-boilerplates/nodejs-package/badges/issue_count.svg)](https://codeclimate.com/github/hexlet-boilerplates/nodejs-package)
-[![Build Status](https://travis-ci.org/hexlet-boilerplates/nodejs-package.svg?branch=master)](https://travis-ci.org/hexlet-boilerplates/nodejs-package)
+[![Code Climate](https://codeclimate.com/github/antonshwab/project-lvl4-s113/badges/gpa.svg)](https://codeclimate.com/github/antonshwab/project-lvl4-s113)
+[![Issue Count](https://codeclimate.com/github/antonshwab/project-lvl4-s113/badges/issue_count.svg)](https://codeclimate.com/github/antonshwab/project-lvl4-s113)
+[![Build Status](https://travis-ci.org/antonshwab/project-lvl4-s113.svg?branch=master)](https://travis-ci.org/antonshwab/project-lvl4-s113)
 
 ## Setup
 
