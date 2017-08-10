@@ -1,5 +1,6 @@
 import 'babel-polyfill';
 
+import dotenv from 'dotenv';
 import path from 'path';
 import Koa from 'koa';
 import Pug from 'koa-pug';
@@ -32,9 +33,9 @@ export default () => {
     await next();
   });
   app.use(bodyParser());
-  app.use(methodOverride((req) => {
+  app.use(methodOverride((req) => { // eslint-disable-line consistent-return
     if (req.body && typeof req.body === 'object' && '_method' in req.body) {
-      return req.body._method;
+      return req.body._method; // eslint-disable-line no-underscore-dangle
     }
   }));
   app.use(serve(path.join(__dirname, '..', 'public')));
@@ -65,9 +66,11 @@ export default () => {
   });
   pug.use(app);
 
-  rollbar.init('a07d766f19784046a86663c51e842310');
-  rollbar.reportMessage('Hello world!');
-  app.use(rollbar.errorHandler('a07d766f19784046a86663c51e842310'));
+  dotenv.config();
+
+  rollbar.init(process.env.ROLLBAR);
+  rollbar.reportMessage('Hello!');
+  app.use(rollbar.errorHandler(process.env.ROLLBAR));
 
   return app;
 };
