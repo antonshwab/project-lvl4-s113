@@ -1,5 +1,5 @@
 import buildFormObj from '../lib/formObjectBuilder';
-import { encrypt } from '../lib/secure';
+import encrypt from '../lib/secure';
 import logger from '../lib/logger';
 
 const log = logger('app:session');
