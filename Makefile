@@ -7,7 +7,7 @@ init:
 	npm run gulp init
 
 start:
-	DEBUG="application:*" npm run nodemon -- --watch src --ext '.js,.pug' --exec npm run gulp -- server
+	DEBUG="app:*" npm run nodemon -- --watch src --ext '.js,.pug' --exec npm run gulp -- server
 
 install-deps:
 	yarn
