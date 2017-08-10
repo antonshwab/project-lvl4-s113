@@ -1,0 +1,21 @@
+extends /layouts/application.pug
+
+block content
+  h3 Your profile
+  table.table.table-stripped
+    thead
+      tr
+        th Full Name
+        th Email
+    tbody
+      tr
+        td= user.fullName
+        td= user.email
+  form(action=`/users/${user.id}/edit` method='get')
+    .form-group
+      input(type='hidden')
+      button(class='btn') Edit
+  form(action=`/users/${user.id}` method='post')
+    .form-group
+      input(type='hidden' name='_method' value='DELETE')
+      button(class='btn btn-danger') Delete
