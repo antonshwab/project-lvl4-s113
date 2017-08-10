@@ -1,0 +1,11 @@
+extends /layouts/application.pug
+
+block content
+  h3 Edit
+  +formFor(f, { url: urlFor('updateProfile', f.object.id), method: 'post' })
+    +input(f, 'email')
+    +input(f, 'firstName')
+    +input(f, 'lastName')
+    +input(f, 'password', { as: 'password' })
+    input(type="hidden" name="_method" value="PATCH")
+    +button(f)
