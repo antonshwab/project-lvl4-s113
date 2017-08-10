@@ -25,4 +25,10 @@ lint:
 publish:
 	npm publish
 
+deploy:
+	git push heroku master
+
+open:
+	heroku open
+
 .PHONY: test
