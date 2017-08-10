@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for task-manager/src/controllers/sessions.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../index.html">All files</a> / <a href="index.html">task-manager/src/controllers</a> sessions.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">12.5% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>2/16</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/4</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">25% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>1/4</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">12.5% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>2/16</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import buildFormObj from '../lib/formObjectBuilder';
+import { encrypt } from '../lib/secure';
+import logger from '../lib/logger';
+&nbsp;
+const log = logger('app:session');
+&nbsp;
+export default (router, { User }) =&gt; {
+  router
+    .get('newSession', '/session/new', <span class="fstat-no" title="function not covered" >as</span>ync (ctx) =&gt; {
+      const data = <span class="cstat-no" title="statement not covered" >{};</span>
+<span class="cstat-no" title="statement not covered" >      ctx.render('sessions/new', { f: buildFormObj(data) });</span>
+    })
+    .post('session', '/session', <span class="fstat-no" title="function not covered" >as</span>ync (ctx) =&gt; {
+      const { email, password } = <span class="cstat-no" title="statement not covered" >ctx.request.body.form;</span>
+<span class="cstat-no" title="statement not covered" >      log('Sign in with email: %s, password: %s', email, password);</span>
+      const user = <span class="cstat-no" title="statement not covered" >await User.findOne({</span>
+        where: {
+          email,
+        },
+      });
+<span class="cstat-no" title="statement not covered" >      log('User: %o', user);</span>
+<span class="cstat-no" title="statement not covered" >      if (user &amp;&amp; user.passwordDigest === encrypt(password)) {</span>
+<span class="cstat-no" title="statement not covered" >        ctx.session.userId = user.id;</span>
+<span class="cstat-no" title="statement not covered" >        ctx.redirect(router.url('root'));</span>
+<span class="cstat-no" title="statement not covered" >        return;</span>
+      }
+<span class="cstat-no" title="statement not covered" >      ctx.flash.set('email or password were wrong');</span>
+<span class="cstat-no" title="statement not covered" >      ctx.render('sessions/new', { f: buildFormObj({ email }) });</span>
+    })
+    .delete('session', '/session', <span class="fstat-no" title="function not covered" >(c</span>tx) =&gt; {
+<span class="cstat-no" title="statement not covered" >      ctx.session = {};</span>
+<span class="cstat-no" title="statement not covered" >      ctx.redirect(router.url('root'));</span>
+    });
+};
+&nbsp;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Aug 10 2017 17:32:13 GMT+0300 (+03)
+</div>
+</div>
+<script src="../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../sorter.js"></script>
+</body>
+</html>
