@@ -1,4 +1,9 @@
 extends /layouts/application.pug
 
+block profileLink
+  if isSignedIn()
+    li.nav-item.active
+      a.nav-link(href=urlFor('profile', session.userId)) Profile
+
 block content
-  h3 index!
+  h3 index!!!!
