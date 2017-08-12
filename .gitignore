@@ -6,3 +6,4 @@ flow-typed
 *.sqlite
 public/assets
 coverage
+.env
