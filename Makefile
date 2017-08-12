@@ -17,7 +17,7 @@ build:
 	npm run build
 
 test:
-	NODE_ENV=test npm test
+	NODE_ENV=test DEBUG="app:*" npm test
 
 lint:
 	npm run eslint -- src __tests__
