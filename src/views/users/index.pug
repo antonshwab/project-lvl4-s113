@@ -7,9 +7,11 @@ block content
         th Full Name
         th Email
         th Created At
+        th User id
     tbody
       each user in users
         tr
           td= user.fullName
           td= user.email
           td= user.createdAt
+          td= user.id
