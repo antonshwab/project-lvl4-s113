@@ -10,7 +10,15 @@
     "node": "8.2.1"
   },
   "jest": {
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "collectCoverage": true,
+    "coverageReporters": [
+      "lcov"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/__tests__/__fixtures__/"
+    ]
   },
   "scripts": {
     "gulp": "gulp",
@@ -45,6 +53,7 @@
     "css-loader": "*",
     "debug": "*",
     "dotenv": "*",
+    "faker": "^4.1.0",
     "gulp": "*",
     "gulp-util": "*",
     "jquery": "*",
@@ -78,16 +87,5 @@
     "jest-supertest-matchers": "*",
     "nodemon": "*",
     "supertest": "*"
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "collectCoverage": true,
-    "coverageReporters": [
-      "lcov"
-    ],
-    "testPathIgnorePatterns": [
-      "<rootDir>/node_modules/",
-      "<rootDir>/__tests__/__fixtures__/"
-    ]
   }
 }
