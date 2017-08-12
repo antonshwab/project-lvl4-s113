@@ -28,7 +28,7 @@ html(lang="en")
             li.nav-item
               a.nav-link(href=urlFor('newUser')) Sign Up
     .container
-      - const msg = flash.get()
+      - const msg = flash.get() || flashNowMsg
       if msg
         .alert.alert-info.m-3= msg
       block content
