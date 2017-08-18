@@ -1,10 +1,5 @@
 extends /layouts/application.pug
 
-block profileLink
-  if isSignedIn()
-    li.nav-item.active
-      a.nav-link(href=urlFor('showUser', session.userId)) Profile
-
 block content
   if isSignedIn()
     h3 Hello, master!
