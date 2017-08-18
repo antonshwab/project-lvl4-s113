@@ -1,0 +1,38 @@
+extends /layouts/application.pug
+
+block content
+  div.container
+    div.row
+      div.col-2='ID:'
+      div.col-10=`${preparedTask.id}`
+    div.row
+      div.col-2='Task:'
+      div.col-10=`${preparedTask.name}`
+    div.row
+      div.col-2='Description:'
+      div.col-10=`${preparedTask.description}`
+    div.row
+      div.col-2='Status:'
+      div.col-10=`${preparedTask.status}`
+    div.row
+      div.col-2='Creator:'
+      div.col-10=`${preparedTask.creator}`
+    div.row
+      div.col-2='Assign to:'
+      div.col-10=`${preparedTask.assignedTo}`
+    div.row
+      div.col-2='Tags:'
+      div.col-10
+        ul.list-inline
+          each tag in preparedTask.tags
+            li.list-inline-item= tag
+
+  h3 Edit task:  
+  +formFor(f, { url: urlFor('updateTask', preparedTask.id), method: 'post' })
+    +input(f, 'name', 'Name')
+    +textarea(f, 'description', 'Description')
+    +input(f, 'tags', 'Tags')
+    +selectUser(f, 'assignedToId', 'Assign to', users)
+    +selectStatus(f, 'statusId', 'Status', statuses)
+    input(type="hidden" name="_method" value="PATCH")
+    +button(f, 'Update')

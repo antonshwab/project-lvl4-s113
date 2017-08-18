@@ -1,0 +1,58 @@
+extends /layouts/application.pug
+
+block content
+  .container.mb-5.mt-4.mx-auto(style="width: 200px;")
+    a.btn.btn-primary(href=urlFor('newTask') role=button)
+      | New task
+
+  .container.mb-5
+    form.form-inline(action=urlFor('tasks'))
+      .form-group.mr-4
+        label.mr-2 Creator:
+        select(name='creatorId' class='form-control')
+          option(value='' selected) Any
+          if isSignedIn()
+            option(value=nowUserId) Me
+      .form-group.mr-4
+        label.mr-2 Assigned to:
+        select(name='assignedToId' class='form-control')
+          option(value='') Any
+          if isSignedIn()
+            option(value=nowUserId) Me
+          each user in users
+            option(value= user.id)= `${user.fullName}`
+      .form-group.mr-4
+        label.mr-2 Status:
+        select(name='statusId' class='form-control')
+          option(value='' selected) --
+          each status in statuses
+            option(value= status.id)= status.name
+      .form-group.mr-4
+        label.mr-2 Tags:
+        select(name='tagId' class='form-control')
+          option(value='' selected) --
+          each tag in tags
+            option(value= tag.id)= tag.name
+      .form-group
+        button(class='btn btn-primary' type='submit')
+          i.mr-1.fa.fa-search
+          | Search
+
+  table.table.table-stripped
+    thead
+      tr
+        th Task
+        th Status
+        th Assigned
+        th Creator
+        th Tags
+    tbody
+      each task in preparedTasks
+        tr
+          td
+            a.btn.btn-primary(href=urlFor('showTask', task.id) role='button')= `${task.name}`
+          td= task.status
+          td= task.assignedTo
+          td= task.creator
+          td= task.tags
+
