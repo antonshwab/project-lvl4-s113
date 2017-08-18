@@ -38,4 +38,6 @@ export default connect => connect.define('Task', {
     allowNull: false,
   },
 
+}, {
+  freezeTableName: true,
 });

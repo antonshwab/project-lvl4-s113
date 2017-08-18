@@ -9,4 +9,7 @@ export default connect => connect.define('TaskStatus', {
       notEmpty: true,
     },
   },
+}, {
+  freezeTableName: true,
+  timestamps: false,
 });

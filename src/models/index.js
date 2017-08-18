@@ -9,8 +9,8 @@ export default (connect) => {
     User: getUser(connect),
     Task: getTask(connect),
     Tag: getTag(connect),
-    TaskTag: getTaskTag(connect),
     TaskStatus: getTaskStatus(connect),
+    TaskTag: getTaskTag(connect),
   };
 
   models.User.hasMany(models.Task, { foreignKey: 'creatorId', as: 'creator' });
