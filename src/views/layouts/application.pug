@@ -7,7 +7,7 @@ html(lang="en")
     script(src='/assets/vendor.js')
     script(src='/assets/application.js')
   body
-    nav.navbar.navbar-toggleable-md.navbar-light.bg-faded
+    nav.navbar.navbar-toggleable-md.navbar-dark.bg-faded
       button.navbar-toggler.navbar-toggler-right
         span.navbar-toggler-icon
       a.navbar-brand(href="/") Task Manager
@@ -16,7 +16,10 @@ html(lang="en")
           li.nav-item.active
             a.nav-link(href=urlFor('users')) Users
           if isSignedIn()
-            block profileLink
+            li.nav-item.active
+              a.nav-link(href=urlFor('showUser', nowUserId)) Profile
+          li.nav-item.active
+            a.nav-link(href=urlFor('tasks')) Tasks
 
         ul.navbar-nav
           if isSignedIn()
