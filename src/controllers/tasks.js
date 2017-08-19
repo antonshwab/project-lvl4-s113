@@ -95,7 +95,7 @@ export default (router, { Task, User, Tag, TaskStatus }) => {
         form.creatorId = ctx.session.userId;
         log('Request form: %o', form);
         const users = await User.findAll();
-        const tags = form.tags.split(' ');
+        const tags = form.tags.split(',');
         const task = Task.build(form);
         try {
           await task.save();
