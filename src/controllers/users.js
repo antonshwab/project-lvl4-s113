@@ -28,61 +28,91 @@ export default (router, { User }) => {
       }
     })
     .get('showUser', '/users/:id', async (ctx) => {
-      const userId = Number(ctx.params.id);
-      const user = await User.findById(userId);
-      if (user && userId === ctx.session.userId) {
-        ctx.render('users/show', { user });
-      } else {
+      if (!ctx.session.userId) {
         ctx.flash.set('You need sign in to view this profile');
         ctx.redirect(router.url('newSession'));
+        return;
       }
+
+      const userId = Number(ctx.params.id);
+
+      if (ctx.session.userId !== userId) {
+        ctx.flash.set('You can not view this profile');
+        ctx.redirect(router.url('403'));
+        return;
+      }
+      const user = await User.findById(userId);
+      ctx.render('users/show', { user });
     })
     .get('editProfile', '/users/:id/edit', async (ctx) => {
-      const userId = Number(ctx.params.id);
-      if (ctx.session.userId === userId) {
-        const user = await User.findById(userId);
-        ctx.render('users/edit', { f: buildFormObj(user) });
-      } else {
+      if (!ctx.session.userId) {
         ctx.flash.set('You need sign in to edit this profile');
         ctx.redirect(router.url('newSession'));
+        return;
       }
+
+      const userId = Number(ctx.params.id);
+
+      if (ctx.session.userId !== userId) {
+        ctx.flash.set('You can not edit this profile');
+        ctx.redirect(router.url('403'));
+        return;
+      }
+      const user = await User.findById(userId);
+      ctx.render('users/edit', { f: buildFormObj(user) });
     })
     .patch('updateProfile', '/users/:id', async (ctx) => {
+      if (!ctx.session.userId) {
+        ctx.flash.set('You need sign in to update this profile');
+        ctx.redirect(router.url('newSession'));
+        return;
+      }
+
       const userId = Number(ctx.params.id);
+
+      if (ctx.session.userId !== userId) {
+        ctx.flash.set('You can not update this profile');
+        ctx.redirect(router.url('403'));
+        return;
+      }
+
       const form = ctx.request.body.form;
       const user = await User.findById(userId);
-      if (ctx.session.userId === userId) {
-        try {
-          await user.update({
-            email: form.email,
-            firstName: form.firstName,
-            lastName: form.lastName,
-            password: form.password,
-          }, { where: { id: userId } });
-          ctx.flash.set('User profile was updated');
-          ctx.redirect(`/users/${userId}`);
-        } catch (err) {
-          rollbar.handleError(err);
-          ctx.render('users/edit', { f: buildFormObj(user, err) });
-        }
-      } else {
-        ctx.flash.set('You need sign in to edit this profile');
-        ctx.redirect(router.url('newSession'));
+      try {
+        await user.update({
+          email: form.email,
+          firstName: form.firstName,
+          lastName: form.lastName,
+          password: form.password,
+        }, { where: { id: userId } });
+        ctx.flash.set('User profile was updated');
+        ctx.redirect(`/users/${userId}`);
+      } catch (err) {
+        rollbar.handleError(err);
+        ctx.render('users/edit', { f: buildFormObj(user, err) });
       }
     })
     .delete('deleteUser', '/users/:id', async (ctx) => {
-      const userId = Number(ctx.params.id);
-      if (ctx.session.userId === userId) {
-        await User.destroy({
-          where: { id: userId },
-        });
-        log('Current session object: %o', ctx.session);
-        ctx.session = {};
-        ctx.flash.set('You was deleted');
-        ctx.redirect(router.url('root'));
-      } else {
-        ctx.flash.set('You need sing in to edit this profile');
+      if (!ctx.session.userId) {
+        ctx.flash.set('You need sign in to delete this profile');
         ctx.redirect(router.url('newSession'));
+        return;
       }
+
+      const userId = Number(ctx.params.id);
+
+      if (ctx.session.userId !== userId) {
+        ctx.flash.set('You can not delete this profile');
+        ctx.redirect(router.url('403'));
+        return;
+      }
+
+      await User.destroy({
+        where: { id: userId },
+      });
+      log('Current session object: %o', ctx.session);
+      ctx.session = {};
+      ctx.flash.set('You was deleted');
+      ctx.redirect(router.url('root'));
     });
 };
