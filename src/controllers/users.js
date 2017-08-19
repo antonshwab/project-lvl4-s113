@@ -6,14 +6,17 @@ const log = logger('app:users');
 
 export default (router, { User }) => {
   router
+
     .get('users', '/users', async (ctx) => {
       const users = await User.findAll();
       ctx.render('users', { users });
     })
+
     .get('newUser', '/users/new', (ctx) => {
       const user = User.build();
       ctx.render('users/new', { f: buildFormObj(user) });
     })
+
     .post('newUser', '/users', async (ctx) => {
       const form = ctx.request.body.form;
       log('form: %o', ctx.request.body.form);
@@ -27,6 +30,7 @@ export default (router, { User }) => {
         ctx.render('users/new', { f: buildFormObj(user, err) });
       }
     })
+
     .get('showUser', '/users/:id', async (ctx) => {
       if (!ctx.session.userId) {
         ctx.flash.set('You need sign in to view this profile');
@@ -44,6 +48,7 @@ export default (router, { User }) => {
       const user = await User.findById(userId);
       ctx.render('users/show', { user });
     })
+
     .get('editProfile', '/users/:id/edit', async (ctx) => {
       if (!ctx.session.userId) {
         ctx.flash.set('You need sign in to edit this profile');
@@ -61,6 +66,7 @@ export default (router, { User }) => {
       const user = await User.findById(userId);
       ctx.render('users/edit', { f: buildFormObj(user) });
     })
+
     .patch('updateProfile', '/users/:id', async (ctx) => {
       if (!ctx.session.userId) {
         ctx.flash.set('You need sign in to update this profile');
@@ -92,6 +98,7 @@ export default (router, { User }) => {
         ctx.render('users/edit', { f: buildFormObj(user, err) });
       }
     })
+
     .delete('deleteUser', '/users/:id', async (ctx) => {
       if (!ctx.session.userId) {
         ctx.flash.set('You need sign in to delete this profile');

@@ -28,11 +28,10 @@ block content
             li.list-inline-item= tag
 
   h3 Edit task:  
-  +formFor(f, { url: urlFor('updateTask', preparedTask.id), method: 'post' })
+  +formFor(f, { url: urlFor('updateTask', preparedTask.id), method: 'post', as: 'patch' })
     +input(f, 'name', 'Name')
     +textarea(f, 'description', 'Description')
     +input(f, 'tags', 'Tags')
     +selectUser(f, 'assignedToId', 'Assign to', users)
     +selectStatus(f, 'statusId', 'Status', statuses)
-    input(type="hidden" name="_method" value="PATCH")
     +button(f, 'Update')

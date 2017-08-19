@@ -1,9 +1,10 @@
 extends /layouts/application.pug
 
 block content
-  .container.mb-5.mt-4.mx-auto(style="width: 200px;")
+  div.d-flex.justify-content-center.mt-4.mb-4
     a.btn.btn-primary(href=urlFor('newTask') role=button)
       | New task
+  
 
   .container.mb-5
     form.form-inline(action=urlFor('tasks'))

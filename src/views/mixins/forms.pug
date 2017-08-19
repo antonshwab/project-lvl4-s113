@@ -1,7 +1,10 @@
 - const getInputName = (f, property) => `${f.name}[${property}]`
 
 mixin formFor(f, options = {})
+  - const realMethod = options['as']
   form(action=_.get(options, 'url') method=_.get(options, 'method', 'get'))
+    if realMethod
+      input(type="hidden" name="_method" value=realMethod)
     block
 
 mixin input(f, property, label, options = { as: 'text' })
