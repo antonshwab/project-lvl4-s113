@@ -85,30 +85,54 @@ describe('requests', () => {
     expect(res.headers.location).toBe('/');
   });
 
-  it('can not view other profile', async () => {
+  it('can not view profile without regsistration', async () => {
     const res = await request.agent(server)
       .get('/users/1');
     expect(res).toHaveHTTPStatus(302);
     expect(res.headers.location).toBe('/session/new');
   });
 
-  it('can not update other profile', async () => {
+  it('can not update profile without regsistration', async () => {
     const res = await request.agent(server)
       .patch('/users/1');
     expect(res).toHaveHTTPStatus(302);
     expect(res.headers.location).toBe('/session/new');
   });
 
-  it('can not edit other profile', async () => {
+  it('can not edit profile without regsistration', async () => {
     const res = await request.agent(server)
       .get('/users/1/edit');
     expect(res).toHaveHTTPStatus(302);
     expect(res.headers.location).toBe('/session/new');
   });
 
-  it('can not delete other profile', async () => {
+  it('can not delete profile without regsistration', async () => {
     const res = await request.agent(server)
       .delete('/users/1');
+    expect(res).toHaveHTTPStatus(302);
+    expect(res.headers.location).toBe('/session/new');
+  });
+
+  it('can not update task without registration', async () => {
+    const res = await request.agent(server).patch('/tasks/1');
+    expect(res).toHaveHTTPStatus(302);
+    expect(res.headers.location).toBe('/session/new');
+  });
+
+  it('can not edit task without registration', async () => {
+    const res = await request.agent(server).get('/tasks/1/edit');
+    expect(res).toHaveHTTPStatus(302);
+    expect(res.headers.location).toBe('/session/new');
+  });
+
+  it('can not delete task without registration', async () => {
+    const res = await request.agent(server).delete('/tasks/1');
+    expect(res).toHaveHTTPStatus(302);
+    expect(res.headers.location).toBe('/session/new');
+  });
+
+  it('can not create new task without registration', async () => {
+    const res = await request.agent(server).post('/tasks');
     expect(res).toHaveHTTPStatus(302);
     expect(res.headers.location).toBe('/session/new');
   });
