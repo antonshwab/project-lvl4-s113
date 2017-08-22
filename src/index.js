@@ -18,9 +18,38 @@ import rollbar from 'rollbar';
 import getWebpackConfig from '../webpack.config.babel';
 import addRoutes from './controllers';
 import container from './container';
+import logger from './lib/logger';
+
+const log = logger('app:index');
 
 export default () => {
   const app = new Koa();
+
+  app.use(async (ctx, next) => {
+    try {
+      await next();
+    } catch (err) {
+      log('Error from top error handler: %o', err);
+      ctx.status = err.status || 500;
+      ctx.body = err.message;
+      ctx.app.emit('error', err, ctx);
+    }
+  });
+
+  app.on('error', (err, ctx) => {
+    log('Hello from error handling middleware!: %o', err);
+    ctx.status = err.status;
+    switch (err.status) {
+      case 404:
+        ctx.render('errors/404', { errMsg: ctx.body });
+        break;
+      case 403:
+        ctx.flash.set(ctx.body);
+        break;
+      default:
+        ctx.render('errors/500', { errMsg: ctx.body });
+    }
+  });
 
   app.keys = ['some secret hurr'];
   app.use(session(app));
@@ -28,8 +57,16 @@ export default () => {
   app.use(async (ctx, next) => {
     ctx.state = {
       flash: ctx.flash,
-      isSignedIn: () => ctx.session.userId !== undefined,
-      nowUserId: Number(ctx.session.userId),
+      currentUser: {
+        id: Number(ctx.session.userId),
+        isSignedIn: () => ctx.session.userId !== undefined,
+        hasRightsToViewUser: user => user.id === ctx.state.currentUser.id,
+        hasRightsToEditTask: task =>
+          task.creatorId === ctx.state.currentUser.id ||
+          task.assignedToId === ctx.state.currentUser.id,
+        hasRightsToDeleteTask: task =>
+          task.creatorId === ctx.state.currentUser.id,
+      },
     };
     await next();
   });
@@ -52,6 +89,10 @@ export default () => {
   addRoutes(router, container);
   app.use(router.allowedMethods());
   app.use(router.routes());
+
+  app.use(async (ctx) => {
+    ctx.throw(404);
+  });
 
   const pug = new Pug({
     viewPath: path.join(__dirname, 'views'),

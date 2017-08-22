@@ -51,4 +51,40 @@ const getWhere = async (query, Tag) => {
   return where;
 };
 
-export { getWhere, getTaskIdRangeBy, prepareTask };
+const getRequiredAuth = (router, msg = 'You need sign in') =>
+  async (ctx, next) => {
+    if (!ctx.state.currentUser.isSignedIn()) {
+      ctx.flash.set(msg);
+      ctx.redirect(router.url('newSession'));
+      return;
+    }
+    await next();
+  };
+const getRequiredExist = (router, resource, msg = 'Not Found') =>
+  async (ctx, next) => {
+    const resourceId = Number(ctx.params.id);
+    const resourceInstance = await resource.findById(resourceId);
+    if (!resourceInstance) {
+      ctx.throw(404, msg);
+    }
+    await next();
+  };
+
+const getRequiredRights = (hasRights, resource, msg = 'Access denied') =>
+  async (ctx, next) => {
+    const resourceId = Number(ctx.params.id);
+    const resourceInstance = await resource.findById(resourceId);
+    if (!ctx.state.currentUser[hasRights](resourceInstance)) {
+      ctx.throw(403, msg);
+    }
+    await next();
+  };
+
+export {
+  getWhere,
+  getTaskIdRangeBy,
+  prepareTask,
+  getRequiredAuth,
+  getRequiredExist,
+  getRequiredRights,
+};
