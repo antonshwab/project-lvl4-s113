@@ -3,7 +3,7 @@ import matchers from 'jest-supertest-matchers';
 import faker from 'faker';
 
 import app from '../src';
-import container from '../src/container'; 
+import container from '../src/container';
 import init from '../src/init';
 
 const userData1 = {
