@@ -1,11 +1,18 @@
 - const getInputName = (f, property) => `${f.name}[${property}]`
 
-mixin formFor(f, options = {})
+mixin formFor(options = {})
   - const realMethod = options['as']
-  form(action=_.get(options, 'url') method=_.get(options, 'method', 'get'))
-    if realMethod
-      input(type="hidden" name="_method" value=realMethod)
-    block
+  - const dataConfirm = options['dataConfirm']
+  if dataConfirm
+    form(action=_.get(options, 'url') method=_.get(options, 'method', 'get') data-confirm=dataConfirm)
+      if realMethod
+        input(type="hidden" name="_method" value=realMethod)
+      block
+  else  
+    form(action=_.get(options, 'url') method=_.get(options, 'method', 'get'))
+      if realMethod
+        input(type="hidden" name="_method" value=realMethod)
+      block
 
 mixin input(f, property, label, options = { as: 'text' })
   - const value = f.object[property] === undefined ? '' : f.object[property]
@@ -14,10 +21,6 @@ mixin input(f, property, label, options = { as: 'text' })
     input(name=getInputName(f, property) class='form-control' type=options['as'] value=`${value}`)
     if f.errors[property]
       .form-control-feedback= f.errors[property].map(({ message }) => message).join('. ')
-
-mixin button(f, value='Save', type = 'submit')
-  .form-group
-    input(class='btn' type=`${type}` value=`${value}`)
 
 mixin textarea(f, property, label, options = { rows: '3' })
   - const value = f.object[property] === undefined ? '' : f.object[property]
@@ -58,3 +61,29 @@ mixin selectStatus(f, property, label, statuses)
     if f.errors[property]
       .form-control-feedback= f.errors[property].map(({ message }) => message).join('. ')
 
+mixin task(preparedTask)
+  div.container
+    div.row
+      div.col-2='ID:'
+      div.col-10=`${preparedTask.id}`
+    div.row
+      div.col-2='Task:'
+      div.col-10=`${preparedTask.name}`
+    div.row
+      div.col-2='Description:'
+      div.col-10=`${preparedTask.description}`
+    div.row
+      div.col-2='Status:'
+      div.col-10=`${preparedTask.status}`
+    div.row
+      div.col-2='Creator:'
+      div.col-10=`${preparedTask.creator}`
+    div.row
+      div.col-2='Assign to:'
+      div.col-10=`${preparedTask.assignedTo}`
+    div.row
+      div.col-2='Tags:'
+      div.col-10
+        ul.list-inline
+          each tag in preparedTask.tags
+            li.list-item= tag

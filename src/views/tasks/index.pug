@@ -12,14 +12,14 @@ block content
         label.mr-2 Creator:
         select(name='creatorId' class='form-control')
           option(value='' selected) Any
-          if isSignedIn()
-            option(value=nowUserId) Me
+          if currentUser.isSignedIn()
+            option(value=currentUser.id) Me
       .form-group.mr-4
         label.mr-2 Assigned to:
         select(name='assignedToId' class='form-control')
           option(value='') Any
-          if isSignedIn()
-            option(value=nowUserId) Me
+          if currentUser.isSignedIn()
+            option(value=currentUser.id) Me
           each user in users
             option(value= user.id)= `${user.fullName}`
       .form-group.mr-4

@@ -2,9 +2,9 @@ extends /layouts/application.pug
 
 block content
   h3 New task:  
-  +formFor(f, { url: urlFor('tasks'), method: 'post' })
+  +formFor({ url: urlFor('tasks'), method: 'post' })
     +input(f, 'name', 'Name')
     +textarea(f, 'description', 'Description')
     +input(f, 'tags', 'Tag')
     +selectUser(f, 'assignedToId', 'Assign to', users)
-    +button(f, 'Create')
+    button.btn.btn-primary(type='submit')= 'Create'

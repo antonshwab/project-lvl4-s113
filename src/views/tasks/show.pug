@@ -1,44 +1,12 @@
 extends /layouts/application.pug
 
 block content
-    div.container
-      div.row
-        div.col-2='ID:'
-        div.col-10=`${preparedTask.id}`
-      div.row
-        div.col-2='Task:'
-        div.col-10=`${preparedTask.name}`
-      div.row
-        div.col-2='Description:'
-        div.col-10=`${preparedTask.description}`
-      div.row
-        div.col-2='Status:'
-        div.col-10=`${preparedTask.status}`
-      div.row
-        div.col-2='Creator:'
-        div.col-10=`${preparedTask.creator}`
-      div.row
-        div.col-2='Assign to:'
-        div.col-10=`${preparedTask.assignedTo}`
-      div.row
-        div.col-2='Tags:'
-        div.col-10
-          ul.list-inline
-            each tag in preparedTask.tags
-              li.list-item= tag
-          
-    if isSignedIn() && (nowUserId === preparedTask.creatorId || nowUserId == preparedTask.assignedToId) 
-      form(action=urlFor('editTask', preparedTask.id) method='get')
-        .form-group
-          input(type='hidden')
-          button(class='btn') Edit
+  +task(preparedTask)      
 
+  if currentUser.isSignedIn() && currentUser.hasRightsToEditTask(preparedTask) 
+    a.btn.btn-primary(href=urlFor('editTask', preparedTask.id), role='button')= 'Edit'
 
-      if preparedTask.creatorId === nowUserId
-        form(data-confirm='Are you sure you want to delete?' action=urlFor('deleteTask', preparedTask.id) method='post')
-          .form-group
-            input(type='hidden' name='_method' value='DELETE')
-            button(class='btn btn-danger') Delete
-    
-    
+  if currentUser.isSignedIn() && currentUser.hasRightsToDeleteTask(preparedTask)
+    +formFor({ url: urlFor('deleteTask', preparedTask.id), method: 'post', as: 'delete', dataConfirm: 'Are you sure you want to delete?'})
+      button.btn.btn-danger(type='submit')= 'Delete'
 

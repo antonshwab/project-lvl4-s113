@@ -2,10 +2,9 @@ extends /layouts/application.pug
 
 block content
   h3 Edit
-  +formFor(f, { url: urlFor('updateProfile', f.object.id), method: 'post' })
+  +formFor({ url: urlFor('updateProfile', f.object.id), method: 'post', as: 'patch' })
     +input(f, 'email')
     +input(f, 'firstName', 'Firstname')
     +input(f, 'lastName', 'Lastname')
     +input(f, 'password', 'Password', { as: 'password' })
-    input(type="hidden" name="_method" value="PATCH")
-    +button(f)
+    button.btn.btn-primary(type='submit')= 'Update'
