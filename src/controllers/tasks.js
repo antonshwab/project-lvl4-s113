@@ -1,12 +1,31 @@
 import rollbar from 'rollbar';
 import { parse } from 'url';
 import buildFormObj from '../lib/formObjectBuilder';
-import { prepareTask, getWhere } from '../lib/helpers';
+import {
+  prepareTask,
+  getWhere,
+  getRequiredAuth,
+  getRequiredExist,
+  getRequiredRights,
+} from '../lib/helpers';
 import logger from '../lib/logger';
 
 const log = logger('app:tasks');
 
 export default (router, { Task, User, Tag, TaskStatus }) => {
+  const reqAuth = getRequiredAuth(router);
+  const reqExist = getRequiredExist(router, Task, 'Task no found');
+
+  const reqRightsToEdit = getRequiredRights(
+    'hasRightsToEditTask',
+    Task,
+    'This task isn\'t created by you or assigned to you. So..');
+
+  const reqRightsToDelete = getRequiredRights(
+    'hasRightsToDeleteTask',
+    Task,
+    'This task isn\'t created by you. So..');
+
   router
     .get('tasks', '/tasks', async (ctx) => {
       const { query } = parse(ctx.request.url, true);
@@ -23,49 +42,39 @@ export default (router, { Task, User, Tag, TaskStatus }) => {
       ctx.render('tasks', { preparedTasks, statuses, users, tags });
     })
 
-    .get('newTask', '/tasks/new', async (ctx) => {
-      const userId = ctx.session.userId;
-      if (!userId) {
-        ctx.flash.set('You need sign in to create task');
-        ctx.redirect(router.url('newSession'));
-        return;
-      }
+    .get('newTask', '/tasks/new', reqAuth, async (ctx) => {
       const task = Task.build();
       const users = await User.findAll();
       ctx.render('tasks/new', { users, f: buildFormObj(task) });
     })
 
-    .get('showTask', '/tasks/:id', async (ctx) => {
+    .get('showTask', '/tasks/:id', reqExist, async (ctx) => {
       const taskId = Number(ctx.params.id);
+      const task = await Task.findById(taskId);
       try {
-        const task = await Task.findById(taskId);
         const preparedTask = await prepareTask(task);
         log('prepared Task: %o', preparedTask);
         ctx.render('tasks/show', { preparedTask });
       } catch (err) {
         log('Error from showTask: %s', err);
+        throw err;
       }
     })
 
-    .post('newTask', '/tasks', async (ctx) => {
-      const userId = ctx.session.userId;
-      if (!userId) {
-        ctx.flash.set('You need sign in to create task');
-        ctx.redirect(router.url('newSession'));
-        return;
-      }
-
+    .post('newTask', '/tasks', reqAuth, async (ctx) => {
       const form = ctx.request.body.form;
-      form.creatorId = ctx.session.userId;
+      form.creatorId = ctx.state.currentUser.id;
       log('Request form: %o', form);
       const users = await User.findAll();
-      const tags = form.tags.split(',');
       const task = Task.build(form);
       try {
         await task.save();
-        await tags.map(tag => Tag.findOne({ where: { name: tag } })
-          .then(async result => (result ? task.addTag(result) :
-            task.createTag({ name: tag }))));
+        if (form.tags && form.tags !== '') {
+          const tags = form.tags.split(',');
+          await tags.map(tag => Tag.findOne({ where: { name: tag } })
+            .then(async result => (result ? task.addTag(result) :
+              task.createTag({ name: tag }))));
+        }
         ctx.flash.set('Task has been created');
         ctx.redirect(router.url('tasks'));
       } catch (err) {
@@ -75,29 +84,10 @@ export default (router, { Task, User, Tag, TaskStatus }) => {
       }
     })
 
-    .get('editTask', '/tasks/:id/edit', async (ctx) => {
-      const userId = Number(ctx.session.userId);
-      if (!userId) {
-        ctx.flash.set('You need sign in to update this task');
-        ctx.redirect(router.url('newSession'));
-        return;
-      }
-
+    .get('editTask', '/tasks/:id/edit', reqAuth, reqExist, reqRightsToEdit, async (ctx) => {
       const taskId = Number(ctx.params.id);
       const task = await Task.findById(taskId);
       log('Current task:', task);
-      if (!task) {
-        ctx.flash.set('This task don\'t exist');
-        ctx.redirect(router.url('404'));
-        return;
-      }
-
-      const isYourTask = [task.creatorId, task.assignedToId].includes(userId);
-      if (!isYourTask) {
-        ctx.flash.set('This task isn\'t created by you or assigned to you. So...');
-        ctx.redirect(router.url('403'));
-        return;
-      }
 
       const users = await User.findAll();
       const preparedTask = await prepareTask(task);
@@ -108,39 +98,20 @@ export default (router, { Task, User, Tag, TaskStatus }) => {
       });
     })
 
-    .patch('updateTask', '/tasks/:id', async (ctx) => {
-      const userId = Number(ctx.session.userId);
-      if (!userId) {
-        ctx.flash.set('You need sign in to update this task');
-        ctx.redirect(router.url('newSession'));
-        return;
-      }
-
+    .patch('updateTask', '/tasks/:id', reqAuth, reqExist, reqRightsToEdit, async (ctx) => {
       const taskId = Number(ctx.params.id);
       const task = await Task.findById(taskId);
+
       log('Current task:', task);
-      if (!task) {
-        ctx.flash.set('This task don\'t exist');
-        ctx.redirect(router.url('404'));
-        return;
-      }
 
       const form = ctx.request.body.form;
-      form.creatorId = userId;
       log('Updated form: %o', form);
-      const isYourTask = [task.creatorId, task.assignedToId].includes(userId);
-      if (!isYourTask) {
-        ctx.flash.set('This task isn\'t created by you or assigned to you. So...');
-        ctx.redirect(router.url('403'));
-        return;
-      }
 
       try {
         await task.update({
           name: form.name,
           description: form.description,
           statusId: Number(form.statusId),
-          creatorId: Number(form.creatorId),
           assignedToId: Number(form.assignedToId),
         });
         const tags = form.tags.split(',');
@@ -148,33 +119,16 @@ export default (router, { Task, User, Tag, TaskStatus }) => {
           .then(async result => (result ? task.addTag(result) :
             task.createTag({ name: tag }))));
         ctx.flash.set('Task has been updated');
-        ctx.redirect(router.url('tasks'));
+        ctx.redirect(router.url('showTask', taskId));
       } catch (err) {
-        log('Post new task error: %o', err);
+        log('Patch task error: %o', err);
         rollbar.handleError(err);
+        throw err;
       }
     })
 
-    .delete('deleteTask', '/tasks/:id', async (ctx) => {
-      if (!ctx.session.userId) {
-        ctx.flash.set('You need sign in to delete this task');
-        ctx.redirect(router.url('newSession'));
-        return;
-      }
-
+    .delete('deleteTask', '/tasks/:id', reqAuth, reqExist, reqRightsToDelete, async (ctx) => {
       const taskId = Number(ctx.params.id);
-      const task = await Task.findById(taskId);
-      log('Current task for delete:', task);
-      if (!task) {
-        ctx.flash.set('This task don\'t exist');
-        ctx.redirect(router.url('404'));
-        return;
-      }
-      if (ctx.session.userId !== task.creatorId) {
-        ctx.flash.set('You can not delete this task');
-        ctx.redirect(router.url('403'));
-        return;
-      }
       await Task.destroy({ where: { id: taskId } });
       ctx.flash.set('Task has been deleted');
       ctx.redirect(router.url('tasks'));

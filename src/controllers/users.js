@@ -1,12 +1,21 @@
 import rollbar from 'rollbar';
 import buildFormObj from '../lib/formObjectBuilder';
 import logger from '../lib/logger';
+import {
+  getRequiredAuth,
+  getRequiredRights,
+} from '../lib/helpers';
 
 const log = logger('app:users');
 
 export default (router, { User }) => {
-  router
+  const reqAuth = getRequiredAuth(router);
+  const reqRights = getRequiredRights(
+    'hasRightsToViewUser',
+    User,
+    'You have no rights to view or change this user');
 
+  router
     .get('users', '/users', async (ctx) => {
       const users = await User.findAll();
       ctx.render('users', { users });
@@ -26,62 +35,26 @@ export default (router, { User }) => {
         ctx.flash.set('User has been created');
         ctx.redirect(router.url('root'));
       } catch (err) {
+        log('newUser err:', err);
         rollbar.handleError(err);
         ctx.render('users/new', { f: buildFormObj(user, err) });
       }
     })
 
-    .get('showUser', '/users/:id', async (ctx) => {
-      if (!ctx.session.userId) {
-        ctx.flash.set('You need sign in to view this profile');
-        ctx.redirect(router.url('newSession'));
-        return;
-      }
-
+    .get('showUser', '/users/:id', reqAuth, reqRights, async (ctx) => {
       const userId = Number(ctx.params.id);
-
-      if (ctx.session.userId !== userId) {
-        ctx.flash.set('You can not view this profile');
-        ctx.redirect(router.url('403'));
-        return;
-      }
       const user = await User.findById(userId);
       ctx.render('users/show', { user });
     })
 
-    .get('editProfile', '/users/:id/edit', async (ctx) => {
-      if (!ctx.session.userId) {
-        ctx.flash.set('You need sign in to edit this profile');
-        ctx.redirect(router.url('newSession'));
-        return;
-      }
-
+    .get('editProfile', '/users/:id/edit', reqAuth, reqRights, async (ctx) => {
       const userId = Number(ctx.params.id);
-
-      if (ctx.session.userId !== userId) {
-        ctx.flash.set('You can not edit this profile');
-        ctx.redirect(router.url('403'));
-        return;
-      }
       const user = await User.findById(userId);
       ctx.render('users/edit', { f: buildFormObj(user) });
     })
 
-    .patch('updateProfile', '/users/:id', async (ctx) => {
-      if (!ctx.session.userId) {
-        ctx.flash.set('You need sign in to update this profile');
-        ctx.redirect(router.url('newSession'));
-        return;
-      }
-
+    .patch('updateProfile', '/users/:id', reqAuth, reqRights, async (ctx) => {
       const userId = Number(ctx.params.id);
-
-      if (ctx.session.userId !== userId) {
-        ctx.flash.set('You can not update this profile');
-        ctx.redirect(router.url('403'));
-        return;
-      }
-
       const form = ctx.request.body.form;
       const user = await User.findById(userId);
       try {
@@ -92,28 +65,15 @@ export default (router, { User }) => {
           password: form.password,
         }, { where: { id: userId } });
         ctx.flash.set('User profile was updated');
-        ctx.redirect(`/users/${userId}`);
+        ctx.redirect(router.url('showUser', userId));
       } catch (err) {
         rollbar.handleError(err);
         ctx.render('users/edit', { f: buildFormObj(user, err) });
       }
     })
 
-    .delete('deleteUser', '/users/:id', async (ctx) => {
-      if (!ctx.session.userId) {
-        ctx.flash.set('You need sign in to delete this profile');
-        ctx.redirect(router.url('newSession'));
-        return;
-      }
-
+    .delete('deleteUser', '/users/:id', reqAuth, reqRights, async (ctx) => {
       const userId = Number(ctx.params.id);
-
-      if (ctx.session.userId !== userId) {
-        ctx.flash.set('You can not delete this profile');
-        ctx.redirect(router.url('403'));
-        return;
-      }
-
       await User.destroy({
         where: { id: userId },
       });
