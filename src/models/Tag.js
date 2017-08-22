@@ -6,6 +6,7 @@ export default connect => connect.define('Tag', {
     unique: true,
     validate: {
       notEmpty: true,
+      // allowNull: false,
     },
   },
 }, {
